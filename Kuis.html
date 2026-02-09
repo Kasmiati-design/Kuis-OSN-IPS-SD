@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SELEKSI OSN IPS - SDN 002 SANGATTA UTARA</title>
+    <style>
+        :root {
+            --primary: #2e59d9;
+            --secondary: #17a673;
+            --danger: #e74a3b;
+            --warning: #f6c23e;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            display: none; /* Hidden at start */
+        }
+
+        /* Welcome Page */
+        #welcome-screen {
+            display: block;
+            text-align: center;
+            color: white;
+        }
+
+        .btn-mulai {
+            background: var(--warning);
+            color: #000;
+            padding: 15px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-mulai:hover { transform: scale(1.1); }
+
+        /* Form Area */
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 20px auto;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* Quiz Layout */
+        .quiz-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-layout { grid-template-columns: 1fr; }
+        }
+
+        .header-quiz {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .timer-box {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--danger);
+            text-align: center;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Soal Styles */
+        .stimulus {
+            background: #f1f4ff;
+            padding: 15px;
+            border-left: 5px solid var(--primary);
+            margin-bottom: 15px;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        .question-box { font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; }
+
+        .options-grid { display: flex; flex-direction: column; gap: 10px; }
+
+        .option-btn {
+            padding: 15px;
+            text-align: left;
+            border: 2px solid #eaecf4;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover { background: #f8f9fc; border-color: var(--primary); }
+        .option-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Sidebar Navigasi */
+        .sidebar {
+            background: #f8f9fc;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .nav-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: var(--danger); /* Default Red */
+        }
+
+        .nav-item.answered { background-color: var(--secondary); }
+        .nav-item.active { border: 2px solid #000; }
+
+        .btn-finish {
+            background: var(--danger);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Result Screen */
+        .result-card { text-align: center; }
+        .score-circle {
+            width: 150px; height: 150px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 20px auto;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <h1>SELEKSI OSN IPS</h1>
+        <h3>SDN 002 SANGATTA UTARA</h3>
+        <div class="form-card">
+            <h4>Pendaftaran Peserta</h4>
+            <input type="text" id="inputNama" placeholder="Nama Lengkap Siswa">
+            <input type="text" id="inputKelas" placeholder="Kelas (Contoh: 5A)">
+            <input type="tel" id="inputHP" placeholder="Nomor HP">
+            <p style="font-size: 12px; color: #666;">Waktu Pengerjaan: 60 Menit</p>
+        </div>
+        <button class="btn-mulai" onclick="startApp()">MULAI</button>
+    </div>
+
+    <div id="quiz-container" class="container">
+        <div class="header-quiz">
+            <h2 style="margin:0; color:var(--primary)">SELEKSI OSN IPS</h2>
+            <small>SDN 002 SANGATTA UTARA</small>
+        </div>
+
+        <div class="quiz-layout">
+            <div class="main-quiz">
+                <div class="timer-box" id="timerDisplay">60:00</div>
+                <div id="quiz-area">
+                    <div class="stimulus" id="stimulus-text"></div>
+                    <div class="question-box" id="question-text"></div>
+                    <div class="options-grid" id="options-area"></div>
+                </div>
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    <button class="option-btn" style="flex:1; text-align:center" onclick="prevQuestion()">Sebelumnya</button>
+                    <button class="option-btn" style="flex:1; text-align:center; background:var(--primary); color:white" onclick="nextQuestion()">Selanjutnya</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <h4 style="margin-top:0">Navigasi Soal</h4>
+                <div class="nav-grid" id="nav-grid"></div>
+                <button class="btn-finish" onclick="tryFinish()">KIRIM JAWABAN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-container" class="container">
+        <div class="result-card">
+            <h2>Hasil Ujian</h2>
+            <p id="resNama"></p>
+            <div class="score-circle" id="scoreDisplay">0</div>
+            <p id="resStats"></p>
+            <button class="btn-mulai" onclick="location.reload()">Selesai</button>
+        </div>
+    </div>
+
+<script>
+    // --- DATABASE SOAL ---
+    // Contoh 5 soal dengan stimulus. Program akan mengacak soal ini.
+    const bankSoal = [
+        {
+            stimulus: "Indonesia terletak di antara dua benua (Asia dan Australia) dan dua samudra (Hindia dan Pasifik). Letak ini sangat menguntungkan bagi perdagangan internasional.",
+            q: "Berdasarkan stimulus tersebut, letak Indonesia yang strategis secara geografis disebut letak...",
+            o: ["Astronomis", "Geologis", "Geografis", "Ekonomis"],
+            a: 2
+        },
+        {
+            stimulus: "Candi Borobudur dibangun pada masa Dinasti Syailendra. Candi ini merupakan salah satu peninggalan bersejarah terbesar di Indonesia yang menunjukkan kejayaan masa lalu.",
+            q: "Candi Borobudur merupakan peninggalan sejarah dari kerajaan yang bercorak...",
+            o: ["Hindu", "Buddha", "Islam", "Kristen"],
+            a: 1
+        },
+        {
+            stimulus: "Di pasar, kita melihat banyak orang melakukan kegiatan jual beli. Ada petani yang menjual beras, dan ada ibu rumah tangga yang membeli sayuran untuk dimasak.",
+            q: "Kegiatan yang dilakukan oleh petani dalam stimulus tersebut disebut kegiatan...",
+            o: ["Konsumsi", "Distribusi", "Produksi", "Investasi"],
+            a: 2
+        },
+        {
+            stimulus: "Masyarakat Indonesia terdiri dari berbagai suku bangsa seperti Suku Dayak, Bugis, Jawa, dan Kutai. Mereka hidup berdampingan dengan semboyan Bhinneka Tunggal Ika.",
+            q: "Sikap yang paling tepat dalam menghadapi keragaman budaya tersebut adalah...",
+            o: ["Etnosentrisme", "Toleransi", "Individualisme", "Primordialisme"],
+            a: 1
+        },
+        {
+            stimulus: "Sebuah keluarga terdiri dari Ayah, Ibu, dan Anak. Ayah bekerja untuk menafkahi keluarga, sementara anak belajar dengan tekun.",
+            q: "Lembaga sosial terkecil yang ada pada stimulus di atas adalah...",
+            o: ["Sekolah", "Keluarga", "Pasar", "Desa"],
+            a: 1
+        }
+        // Tambahkan soal lainnya hingga 50 dengan format yang sama
+    ];
+
+    // Duplikasi soal otomatis untuk simulasi 50 soal (karena keterbatasan teks di sini)
+    while(bankSoal.length < 50) {
+        let clone = {...bankSoal[Math.floor(Math.random()*5)]};
+        bankSoal.push(clone);
+    }
+
+    let currentIdx = 0;
+    let userAnswers = new Array(50).fill(null);
+    let timer;
+    let timeLeft = 3600; // 60 menit
+
+    function startApp() {
+        const nama = document.getElementById('inputNama').value;
+        const kelas = document.getElementById('inputKelas').value;
+        if(!nama || !kelas) return alert("Mohon isi Nama dan Kelas!");
+
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        
+        initNav();
+        renderQuestion();
+        startTimer();
+    }
+
+    function initNav() {
+        const grid = document.getElementById('nav-grid');
+        grid.innerHTML = '';
+        for(let i=0; i<50; i++) {
+            const item = document.createElement('div');
+            item.className = 'nav-item';
+            item.id = 'nav-' + i;
+            item.innerText = i + 1;
+            item.onclick = () => { currentIdx = i; renderQuestion(); };
+            grid.appendChild(item);
+        }
+    }
+
+    function renderQuestion() {
+        const q = bankSoal[currentIdx];
+        document.getElementById('stimulus-text').innerText = q.stimulus;
+        document.getElementById('question-text').innerText = (currentIdx + 1) + ". " + q.q;
+        
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        
+        q.o.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn' + (userAnswers[currentIdx] === i ? ' selected' : '');
+            btn.innerText = String.fromCharCode(65 + i) + ". " + opt;
+            btn.onclick = () => selectOption(i);
+            area.appendChild(btn);
+        });
+
+        // Update Nav UI
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-' + currentIdx).classList.add('active');
+    }
+
+    function selectOption(idx) {
+        userAnswers[currentIdx] = idx;
+        document.getElementById('nav-' + currentIdx).classList.add('answered');
+        renderQuestion();
+    }
+
+    function nextQuestion() {
+        if(currentIdx < 49) { currentIdx++; renderQuestion(); }
+    }
+
+    function prevQuestion() {
+        if(currentIdx > 0) { currentIdx--; renderQuestion(); }
+    }
+
+    function startTimer() {
+        timer = setInterval(() => {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = 
+                (mins < 10 ? '0' : '') + mins + ":" + (secs < 10 ? '0' : '') + secs;
+
+            if(timeLeft <= 0) {
+                clearInterval(timer);
+                alert("Waktu habis!");
+                finishQuiz();
+            }
+        }, 1000);
+    }
+
+    function tryFinish() {
+        const yakin = confirm("Yakin ingin mengirim semua jawaban? Cek lagi jika masih ada yang merah.");
+        if(yakin) finishQuiz();
+    }
+
+    function finishQuiz() {
+        clearInterval(timer);
+        let correct = 0;
+        userAnswers.forEach((ans, i) => {
+            if(ans === bankSoal[i].a) correct++;
+        });
+
+        // Perhitungan: Bobot 1, Benar * 2. Maksimal 100.
+        const totalScore = correct * 2;
+
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('result-container').style.display = 'block';
+        
+        document.getElementById('resNama').innerText = document.getElementById('inputNama').value + " (" + document.getElementById('inputKelas').value + ")";
+        document.getElementById('scoreDisplay').innerText = totalScore;
+        document.getElementById('resStats').innerText = "Benar: " + correct + " | Salah: " + (50 - correct);
+    }
+</script>
+</body>
+</html>
